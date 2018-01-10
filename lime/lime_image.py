@@ -1,3 +1,4 @@
+# CHECKED
 """
 Functions for explaining classifiers that use Image data.
 """

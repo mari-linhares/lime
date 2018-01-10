@@ -1,3 +1,4 @@
+# DEBUG
 """
 Functions for explaining classifiers that use tabular data (matrices).
 """
@@ -199,6 +200,7 @@ class LimeTabularExplainer(object):
         for feature in self.categorical_features:
             feature_count = collections.defaultdict(lambda: 0.0)
             column = training_data[:, feature]
+            # DEBUG: nao ficou clara a condição abaixo
             if self.discretizer is not None:
                 column = discretized_training_data[:, feature]
                 feature_count[0] = 0.

@@ -1,3 +1,4 @@
+# CHECKED
 """
 Explanation class, with visualization functions.
 """

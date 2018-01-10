@@ -1,3 +1,5 @@
+# DEBUG
+
 """
 Contains abstract functionality for learning locally linear sparse model.
 """
@@ -16,14 +18,17 @@ class LimeBase(object):
         """Init function
 
         Args:
+
             kernel_fn: function that transforms an array of distances into an
-                        array of proximity values (floats).
+                       array of proximity values (floats).
+
             verbose: if true, print local prediction values from linear model.
+
             random_state: an integer or numpy.RandomState that will be used to
                 generate random numbers. If None, the random state will be
                 initialized using the internal numpy seed.
         """
-        self.kernel_fn = kernel_fn
+        self.kernel_fn = kernel_fn  # DEBUG: nao ta muito claro
         self.verbose = verbose
         self.random_state = check_random_state(random_state)
 
@@ -48,6 +53,9 @@ class LimeBase(object):
 
     def forward_selection(self, data, labels, weights, num_features):
         """Iteratively adds features to the model"""
+        # DEBUG: essa funcao deveria testar todas as possibilidades de ordem?
+        # num_features * (num_features - 1)
+        # Guloso funciona?
         clf = Ridge(alpha=0, fit_intercept=True, random_state=self.random_state)
         used_features = []
         for _ in range(min(num_features, data.shape[1])):
@@ -84,6 +92,7 @@ class LimeBase(object):
                                      reverse=True)
             return np.array([x[0] for x in feature_weights[:num_features]])
         elif method == 'lasso_path':
+            # DEBUG: nao ficou clara essa operacao
             weighted_data = ((data - np.average(data, axis=0, weights=weights))
                              * np.sqrt(weights[:, np.newaxis]))
             weighted_labels = ((labels - np.average(labels, weights=weights))
@@ -116,24 +125,36 @@ class LimeBase(object):
         """Takes perturbed data, labels and distances, returns explanation.
 
         Args:
+
             neighborhood_data: perturbed data, 2d array. first element is
                                assumed to be the original data point.
+
             neighborhood_labels: corresponding perturbed labels. should have as
                                  many columns as the number of possible labels.
+
             distances: distances to original data point.
-            label: label for which we want an explanation
-            num_features: maximum number of features in explanation
+
+            label: label for which we want an explanation.
+
+            num_features: maximum number of features in explanation.
+
             feature_selection: how to select num_features. options are:
+
                 'forward_selection': iteratively add features to the model.
                     This is costly when num_features is high
+
                 'highest_weights': selects the features that have the highest
                     product of absolute weight * original data point when
                     learning with all the features
+
                 'lasso_path': chooses features based on the lasso
                     regularization path
+
                 'none': uses all features, ignores num_features
+
                 'auto': uses forward_selection if num_features <= 6, and
                     'highest_weights' otherwise.
+
             model_regressor: sklearn regressor to use in explanation.
                 Defaults to Ridge regression if None. Must have
                 model_regressor.coef_ and 'sample_weight' as a parameter
